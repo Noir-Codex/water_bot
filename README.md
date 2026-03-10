@@ -42,7 +42,7 @@ cd water_bot
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # Для macOS/Linux
-# venv\Scripts\activate   # Для Windows
+venv\Scripts\activate   # Для Windows
 ```
 
 ### 3. Установка зависимостей
@@ -67,30 +67,6 @@ DB_PATH=water_bot.db
 Во время работы в виртуальном окружении запустите бота:
 ```bash
 python main.py
-```
-В консоли появится сообщение: `[INFO] __main__: Бот запущен!` 🎉
-
----
-
-## 📂 Структура проекта
-
-```text
-water_bot/
-├── main.py                 # Точка входа: запуск бота, БД и планировщика
-├── requirements.txt        # Список зависимостей проекта
-├── .env                    # Секретные ключи (сверяем с .env.example)
-├── .gitignore              # Исключения для Git (venv, .env, *.db)
-└── bot/
-    ├── config.py           # Загрузка и валидация конфигурации
-    ├── database.py         # Инициализация SQLite таблиц
-    ├── models.py           # Датаклассы для пользователей и логов
-    ├── keyboards.py        # Reply и Inline клавиатуры интерфейса
-    ├── middlewares.py      # Middleware для автоматической передачи сессии БД
-    ├── scheduler.py        # 🧠 Ядро умного планировщика напоминаний
-    └── handlers/           # Логика обработки команд и кнопок
-        ├── start.py        # /start, FSM онбординга, изменение настроек
-        ├── water.py        # Обработка логгирования (кнопки объемов + свой ввод)
-        └── stats.py        # Обработчик просмотра статистики
 ```
 
 ---
