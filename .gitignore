@@ -1,10 +1,32 @@
-*.db
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.egg-info/
+*.egg
 dist/
 build/
+
+# Виртуальные окружения
 .venv/
 venv/
+env/
+
+# База данных
+*.db
+*.sqlite3
+
+# Секреты
+.env
+
+# IDE
 .idea/
 .vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Логи
+*.log

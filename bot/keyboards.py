@@ -17,10 +17,13 @@ def drink_keyboard() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="💧 Стакан (250 мл)", callback_data="water:250"),
         ],
         [
-            InlineKeyboardButton(text="💦 Большой стакан (400 мл)", callback_data="water:400"),
+            InlineKeyboardButton(text="💦 Большой стакан (350 мл)", callback_data="water:350"),
         ],
         [
             InlineKeyboardButton(text="🍶 Бутылка (500 мл)", callback_data="water:500"),
+        ],
+        [
+            InlineKeyboardButton(text="✏️ Свой объём", callback_data="water:custom"),
         ],
     ])
 

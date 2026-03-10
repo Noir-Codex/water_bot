@@ -128,9 +128,11 @@ async def onboarding_sleep(
     data = await state.get_data()
     wake = data["wake_hour"]
 
-    if hour <= wake:
+    # Часы 0-5 считаем «следующим днём» (полночь / поздняя ночь) — всегда OK
+    if hour > 5 and hour <= wake:
         await message.answer(
-            f"Время сна должно быть позже времени подъёма ({wake}:00).\nПопробуй ещё раз.",
+            f"Время сна должно быть позже времени подъёма ({wake}:00).\n"
+            f"Или введи 0–5, если ложишься уже после полуночи.",
             parse_mode="HTML",
         )
         return
@@ -301,6 +303,21 @@ async def apply_sleep(message: Message, state: FSMContext, db: aiosqlite.Connect
             raise ValueError
     except ValueError:
         await message.answer("Введи час числом от 0 до 23", parse_mode="HTML")
+        return
+
+    # Получаем текущий wake_hour чтобы валидировать
+    async with db.execute(
+        "SELECT wake_hour FROM users WHERE telegram_id = ?", (message.from_user.id,)
+    ) as cursor:
+        row = await cursor.fetchone()
+    wake = row["wake_hour"] if row else 7
+
+    if hour > 5 and hour <= wake:
+        await message.answer(
+            f"Время сна должно быть позже подъёма ({wake}:00).\n"
+            f"Или введи 0–5, если ложишься после полуночи.",
+            parse_mode="HTML",
+        )
         return
 
     await db.execute(

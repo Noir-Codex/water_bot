@@ -36,7 +36,7 @@ async def water_button(message: Message, db: aiosqlite.Connection) -> None:
 
 # ─── Callback выбора объёма воды ─────────────────────────────────────────────
 
-@router.callback_query(F.data.startswith("water:"))
+@router.callback_query(F.data.startswith("water:") & ~F.data.endswith("custom"))
 async def water_logged(callback: CallbackQuery, db: aiosqlite.Connection) -> None:
     user = await _get_user(db, callback.from_user.id)
     if not user:
@@ -77,6 +77,59 @@ async def water_logged(callback: CallbackQuery, db: aiosqlite.Connection) -> Non
 
     await callback.message.edit_text(result_text, parse_mode="HTML")
     await callback.answer(f"✅ +{amount_ml} мл записано!")
+
+
+# ─── Свой объём ──────────────────────────────────────────────────────────────
+
+@router.callback_query(F.data == "water:custom")
+async def water_custom_ask(callback: CallbackQuery) -> None:
+    await callback.message.edit_text(
+        "✏️ Введи объём воды в мл (например: <b>320</b>):",
+        parse_mode="HTML",
+    )
+    await callback.answer()
+
+
+@router.message(F.text.regexp(r"^\d+$"))
+async def water_custom_input(message: Message, db: aiosqlite.Connection) -> None:
+    user = await _get_user(db, message.from_user.id)
+    if not user:
+        return
+
+    amount_ml = int(message.text)
+    if not (10 <= amount_ml <= 5000):
+        await message.answer("Введи число от 10 до 5000 мл.")
+        return
+
+    from datetime import datetime
+    await db.execute(
+        "INSERT INTO water_log (user_id, amount_ml) VALUES (?, ?)",
+        (user["id"], amount_ml),
+    )
+    await db.execute(
+        "UPDATE users SET last_reminded_at = ? WHERE id = ?",
+        (datetime.now().isoformat(), user["id"]),
+    )
+    await db.commit()
+
+    today_intake = await get_today_intake(db, user["id"])
+    daily_goal = user["daily_goal_ml"]
+    remaining = max(0, daily_goal - today_intake)
+
+    if today_intake >= daily_goal:
+        result_text = (
+            f"🎉 <b>+{amount_ml} мл добавлено!</b>\n\n"
+            f"✅ Дневная норма выполнена! ({today_intake} / {daily_goal} мл)\n"
+            f"Отличная работа! 💪"
+        )
+    else:
+        result_text = (
+            f"💧 <b>+{amount_ml} мл добавлено!</b>\n\n"
+            f"📊 Сегодня: {today_intake} / {daily_goal} мл\n"
+            f"⏳ Осталось: {remaining} мл"
+        )
+
+    await message.answer(result_text, parse_mode="HTML", reply_markup=drink_keyboard())
 
 
 # ─── /status — быстрый прогресс ──────────────────────────────────────────────
