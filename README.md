@@ -55,10 +55,10 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 ```
-Затем заполните `.env` своими данными (нажмите на ✏️ или откройте в любом редакторе):
+Затем заполните `.env` своими данными:
 ```env
 # Ваш токен от @BotFather в Telegram:
-BOT_TOKEN=1234567890:ABCdefGhIJKLmnopQRstUVwxyZ
+BOT_TOKEN=токен от @BotFather
 # Файл локальной базы данных SQLite:
 DB_PATH=water_bot.db
 ```
